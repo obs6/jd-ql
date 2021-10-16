@@ -44,7 +44,6 @@ if ($.isNode()) {
     }
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
-            console.log(`\n如提示活动火爆,可再执行一次尝试\n`);
             cookie = cookiesArr[i];
             $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
             $.index = i + 1;
@@ -125,7 +124,7 @@ function getCoupon( ) {
                     if (safeGet(data)) {
                         data = $.toObj(data);
                         if (data.code === '0') {
-                            console.log(`=================${JSON.stringify(data)}`);
+                            console.log(`==${JSON.stringify(data)}`);
 
                         } else {
                             console.log(`极速版签到查询奖品：异常:${JSON.stringify(data)}\n`);
