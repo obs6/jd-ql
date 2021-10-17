@@ -67,9 +67,10 @@ if ($.isNode()) {
 
 
         }
-        if ($.isNode()) {
-            await notify.sendNotify($.name, message)
-        }
+
+    }
+    if ($.isNode()) {
+        await notify.sendNotify($.name, message)
     }
 })()
     .catch((e) => {
