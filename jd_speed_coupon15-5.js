@@ -27,7 +27,7 @@ const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let cookiesArr = [], cookie = '', message;
-let reslust = false;
+let reslust = '';
 if ($.isNode()) {
     Object.keys(jdCookieNode).forEach((item) => {
         cookiesArr.push(jdCookieNode[item])
@@ -63,10 +63,17 @@ if ($.isNode()) {
             }
             for(let j = 0; j < 3; j++){
                 await jsRedPacket()
-                if(reslust){
+                if(reslust.indexOf("已抢完")>-1||reslust.indexOf("下一场")>-1){
                     return;
+
                 }
+                else if(reslust.indexOf("已经参加过")>-1){
+                    break;
+
+                }
+
             }
+
         }
     }
 })()
@@ -131,9 +138,9 @@ function getCoupon( ) {
                         data = $.toObj(data);
                         if (data.code === '0') {
                             console.log(`==${JSON.stringify(data)}`);
-                            if(data.subCodeMsg.indexOf("已抢完")>-1||data.subCodeMsg.indexOf("下一场")>-1){
-                                reslust=true;
-                            }
+                            reslust=data.subCodeMsg;
+
+
                         } else {
                             console.log(`极速版签到查询奖品：异常:${JSON.stringify(data)}\n`);
                         }
