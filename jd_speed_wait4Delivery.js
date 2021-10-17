@@ -22,7 +22,7 @@ cron "20 0,22 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包
 ============小火箭=========
 京东极速版红包 = type=cron,script-path=jd_speed_redpocke.js, cronexpr="20 0,22 * * *", timeout=3600, enable=true
 */
-const $ = new Env('京东极速版优惠券15-5');
+const $ = new Env('京东极速版待收货');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -61,18 +61,7 @@ if ($.isNode()) {
                 }
                 continue
             }
-            for(let j = 0; j < 3; j++){
-                await jsRedPacket()
-                if(reslust.indexOf("抢完")>-1||reslust.indexOf("下一场")>-1){
-                    return;
-
-                }
-                else if(reslust.indexOf("已经参加过")>-1){
-                    break;
-
-                }
-
-            }
+            await jsRedPacket()
 
         }
     }
@@ -88,8 +77,10 @@ async function jsRedPacket() {
     try {
         // await invite();
 
-        await getCoupon();
-        await showMsg()
+        let uuid = randomString(16)
+        let sign = await getSign(functionId, decodeURIComponent(body), uuid)
+        console.log(sign)
+        // await showMsg()
     } catch (e) {
         $.logErr(e)
     }
@@ -102,14 +93,13 @@ function showMsg() {
     })
 }
 
-
 function getCoupon( ) {
     return new Promise(resolve => {
 
         const body = {
-            "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
+            "activityId":"vN4YuYXS1mPse7yeVPRq4TNvCMR",
             "scene":"1",
-            "args":"key=BAD9DD8EEDDC5549F74A5B8CB72F8C6C5C7F220AD0B8F2AA0619BB3AF3E75D704B40BB363E9DFAE03B6103B815B4FCB1_babel,roleId=3CCD34BBC21DCD06A02321DD6BC5A87A_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB560929D12F6A1D7E2098CB185B57B981635D_babel"
+            "args":"key=7AE6994C328EB1C89CDB0221057BF411BD41956D70584237E1E4C232A0F444F7AB710999388695EC3FD474AA9F388E18_babel,roleId=FCF48ACDE201EF458A74ED8840CC1D01_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56096E128EEA6C65A59095B26F6CCE30580E_babel"
 
         };
         const options = {
@@ -189,6 +179,42 @@ function taskGetUrl(function_id, body) {
             'Content-Type': "application/x-www-form-urlencoded",
             "referer": "https://an.jd.com/babelDiy/Zeus/q1eB6WUB8oC4eH1BsCLWvQakVsX/index.html"
         }
+    }
+function getSign(functionid, body, uuid) {
+        return new Promise(async resolve => {
+            let data = {
+                "functionId":functionid,
+                "body":body,
+                "uuid":uuid,
+                "client":"android",
+                "clientVersion":"10.1.2"
+            }
+            let HostArr = ['jdsign.cf', 'signer.nz.lu']
+            let Host = HostArr[Math.floor((Math.random() * HostArr.length))]
+            let options = {
+                url: `https://cdn.nz.lu/ddo`,
+                body: JSON.stringify(data),
+                headers: {
+                    Host,
+                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
+                },
+                timeout: 15000
+            }
+            $.post(options, (err, resp, data) => {
+                try {
+                    if (err) {
+                        console.log(`${JSON.stringify(err)}`)
+                        console.log(`${$.name} getSign API请求失败，请检查网路重试`)
+                    } else {
+
+                    }
+                } catch (e) {
+                    $.logErr(e, resp)
+                } finally {
+                    resolve(data);
+                }
+            })
+        })
     }
 }
 

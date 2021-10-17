@@ -63,7 +63,7 @@ if ($.isNode()) {
             }
             for(let j = 0; j < 3; j++){
                 await jsRedPacket()
-                if(reslust.indexOf("已抢完")>-1||reslust.indexOf("下一场")>-1){
+                if(reslust.indexOf("抢完")>-1||reslust.indexOf("下一场")>-1){
                     return;
 
                 }
