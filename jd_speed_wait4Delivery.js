@@ -22,12 +22,13 @@ cron "20 0,22 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包
 ============小火箭=========
 京东极速版红包 = type=cron,script-path=jd_speed_redpocke.js, cronexpr="20 0,22 * * *", timeout=3600, enable=true
 */
-const $ = new Env('京东极速版待收货');
+const $ = new Env('京东待收货');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let cookiesArr = [], cookie = '', message;
+let cookiesArr = [], cookie = '', message='';
 let reslust = '';
+const JD_API_HOST = 'https://api.m.jd.com/client.action';
 if ($.isNode()) {
     Object.keys(jdCookieNode).forEach((item) => {
         cookiesArr.push(jdCookieNode[item])
@@ -50,9 +51,10 @@ if ($.isNode()) {
             $.index = i + 1;
             $.isLogin = true;
             $.nickName = '';
-            message = '';
+            // message = '';
             await TotalBean();
             console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+            message+=`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`;
             if (!$.isLogin) {
                 $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
 
@@ -63,6 +65,10 @@ if ($.isNode()) {
             }
             await jsRedPacket()
 
+
+        }
+        if ($.isNode()) {
+            await notify.sendNotify($.name, message)
         }
     }
 })()
@@ -76,11 +82,16 @@ if ($.isNode()) {
 async function jsRedPacket() {
     try {
         // await invite();
+        // const body = {
+        //     "newUiSwitch": "1",
+        //     "deis": "ey",
+        //     "pass": "",
+        //     "pagesize": "10",
+        //     "page": "1"
+        // };
+        await getOrderList()
+        await showMsg()
 
-        let uuid = randomString(16)
-        let sign = await getSign(functionId, decodeURIComponent(body), uuid)
-        console.log(sign)
-        // await showMsg()
     } catch (e) {
         $.logErr(e)
     }
@@ -92,32 +103,82 @@ function showMsg() {
         resolve()
     })
 }
+async function getOrderTrack(orderId){
+    return new Promise(resolve => {
+        let refer="https://wqs.jd.com/order/deal_wuliu.shtml?from=orderdetail&dealId="+orderId;
+        optionsTrack = {
+            url: "https://wq.jd.com/bases/wuliudetail/dealloglist?deal_id="+orderId,
+            headers: {
+                'Cookie': cookie,
+                "Accept": "*/*",
+                "Connection": "keep-alive",
+                "Referer":refer,
+                // "User-Agent": "jdltapp;iPhone;3.3.2;14.5.1network/wifi;hasUPPay/0;pushNoticeIsOpen/1;lang/zh_CN;model/iPhone13,2;addressid/137923973;hasOCPay/0;appBuild/1047;supportBestPay/0;pv/467.11;apprpd/MyJD_Main;",
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
+                "Accept-Language": "zh-Hans-CN;q=1, en-CN;q=0.9, zh-Hant-CN;q=0.8",
+                "Accept-Encoding": "gzip, deflate, br"
+            }
+        }
 
-function getCoupon( ) {
+        $.get(optionsTrack, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    if (safeGet(data)) {
+                        if (data.indexOf("carriageId") >-1) {
+                            data = $.toObj(data);
+
+                            // console.log(`极速版签到查询奖品：异常:${data.carrier}\n`);
+                            // console.log(`极速版签到查询奖品：异常:${data.carriageId}\n`);
+
+
+
+
+
+                            message += `订单号：${orderId}\n`+
+                                `商品名：${data.orderWareList[0].itemName}\n`+
+                                `物流消息：${data.carrier}==${data.carriageId}\n`+
+                                `${data.dealLogList[data.dealLogList.length-1].wlStateDesc}\n`
+                                +"\n"+"\n"
+
+                            // console.log("----"+message)
+
+
+                        } else {
+                            console.log(`查询订单：异常:${orderId}\n`);
+                            console.log(`查询订单：异常:${JSON.stringify(data)}\n`);
+                        }
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve(data);
+            }
+        })
+    })
+
+}
+async function getOrderList() {
     return new Promise(resolve => {
 
-        const body = {
-            "activityId":"vN4YuYXS1mPse7yeVPRq4TNvCMR",
-            "scene":"1",
-            "args":"key=7AE6994C328EB1C89CDB0221057BF411BD41956D70584237E1E4C232A0F444F7AB710999388695EC3FD474AA9F388E18_babel,roleId=FCF48ACDE201EF458A74ED8840CC1D01_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56096E128EEA6C65A59095B26F6CCE30580E_babel"
-
-        };
         const options = {
-            url: `https://api.m.jd.com`,
-            body: `functionId=lite_newBabelAwardCollection&body=${escape(JSON.stringify(body))}&_t=${+new Date()}&client=wh5`,
+            url: `https://api.m.jd.com/client.action `,
+            body: `functionId=wait4Delivery&body={"newUiSwitch":"1","deis":"dy","dateTimeIndex":"","pass":"","pagesize":"10","page":"1"}&client=apple&clientVersion=10.1.2&openudid=f9438f3648dbbddf67a1d04253eb65250aa13aae&sign=976e85754a62c1d162525b7903ce1065&st=1634449352940&sv=102`,
             headers: {
                 'Cookie': cookie,
                 "Host": "api.m.jd.com",
-                'Origin': 'https://daily-redpacket.jd.com',
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "*/*",
                 "Connection": "keep-alive",
                 "User-Agent": "jdltapp;iPhone;3.3.2;14.5.1network/wifi;hasUPPay/0;pushNoticeIsOpen/1;lang/zh_CN;model/iPhone13,2;addressid/137923973;hasOCPay/0;appBuild/1047;supportBestPay/0;pv/467.11;apprpd/MyJD_Main;",
                 "Accept-Language": "zh-Hans-CN;q=1, en-CN;q=0.9, zh-Hant-CN;q=0.8",
-                'Referer': 'https://daily-redpacket.jd.com/?activityId=9WA12jYGulArzWS7vcrwhw',
                 "Accept-Encoding": "gzip, deflate, br"
             }
         }
+
         $.post(options, async (err, resp, data) => {
             try {
                 if (err) {
@@ -127,12 +188,19 @@ function getCoupon( ) {
                     if (safeGet(data)) {
                         data = $.toObj(data);
                         if (data.code === '0') {
-                            console.log(`==${JSON.stringify(data)}`);
-                            reslust=data.subCodeMsg;
+                            if(data.orderList.length>0){
+                                for(let orderItem of data.orderList){
+                                    await getOrderTrack(orderItem.orderId);
+
+
+                                }
+
+                            }
+
 
 
                         } else {
-                            console.log(`极速版签到查询奖品：异常:${JSON.stringify(data)}\n`);
+                            console.log(`查询订单：异常:${JSON.stringify(data)}\n`);
                         }
                     }
                 }
@@ -180,43 +248,9 @@ function taskGetUrl(function_id, body) {
             "referer": "https://an.jd.com/babelDiy/Zeus/q1eB6WUB8oC4eH1BsCLWvQakVsX/index.html"
         }
     }
-function getSign(functionid, body, uuid) {
-        return new Promise(async resolve => {
-            let data = {
-                "functionId":functionid,
-                "body":body,
-                "uuid":uuid,
-                "client":"android",
-                "clientVersion":"10.1.2"
-            }
-            let HostArr = ['jdsign.cf', 'signer.nz.lu']
-            let Host = HostArr[Math.floor((Math.random() * HostArr.length))]
-            let options = {
-                url: `https://cdn.nz.lu/ddo`,
-                body: JSON.stringify(data),
-                headers: {
-                    Host,
-                    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-                },
-                timeout: 15000
-            }
-            $.post(options, (err, resp, data) => {
-                try {
-                    if (err) {
-                        console.log(`${JSON.stringify(err)}`)
-                        console.log(`${$.name} getSign API请求失败，请检查网路重试`)
-                    } else {
 
-                    }
-                } catch (e) {
-                    $.logErr(e, resp)
-                } finally {
-                    resolve(data);
-                }
-            })
-        })
-    }
 }
+
 
 function TotalBean() {
     return new Promise(async resolve => {
@@ -573,4 +607,12 @@ function Env(t, e) {
             this.log("", `🔔${this.name}, 结束! 🕛 ${s} 秒`), this.log(), (this.isSurge() || this.isQuanX() || this.isLoon()) && $done(t)
         }
     }(t, e)
+}
+
+function randomString(e) {
+    e = e || 32;
+    let t = "abcdefghijklmnopqrstuvwxyz0123456789", a = t.length, n = "";
+    for (let i = 0; i < e; i++)
+        n += t.charAt(Math.floor(Math.random() * a));
+    return n
 }
