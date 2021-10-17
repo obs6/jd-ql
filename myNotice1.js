@@ -107,39 +107,34 @@ function getCoupon() {
                     data = JSON.parse(data.match(new RegExp(/jsonpCBK.?\((.*);*/))[1]);
                     let couponTitle = ''
                     let couponId = ''
-                    if (states[s] === '6') {
-                        // 删除已过期
-                        let expire = data['coupon']['expired']
-                        for (let i = 0; i < expire.length; i++) {
-                            couponTitle = expire[i].couponTitle
-                            couponId = escape(`${expire[i].couponid},1,0`);
-                            // await delCoupon(couponId, couponTitle)
-                        }
-                        // 删除已使用
-                        let used = data['coupon']['used']
-                        for (let i = 0; i < used.length; i++) {
-                            couponTitle = used[i].couponTitle
-                            couponId = escape(`${used[i].couponid},0,0`);
-                            // await delCoupon(couponId, couponTitle)
-                        }
-                    } else if (states[s] === '1') {
+                    if (states[s] === '1') {
                         // 删除可使用且非超市、生鲜、京贴
                         let useable = data.coupon.useable
                         // console.log(`=================${JSON.stringify(useable)}`);
                         for (let i = 0; i < useable.length; i++) {
-                            if (useable[i].couponTitle.indexOf('9.9-') > -1){
-                                let todayEndTime = new Date(new Date(new Date().getTime()).setHours(23,59,59,999)).getTime();
-                                couponEndTime=useable[i].endTime;
+                            if(useable[i].couponTitle.indexOf('极速版APP活动') > -1&&useable[i].couponTitle.indexOf('频道：') > -1){
 
-                                // console.log(`=================${useable[i].couponTitle}`);
+                                $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23,59,59,999)).getTime();
+                                $.tomorrowEndTime = new Date(new Date(new Date().getTime()+24*60*60*1000).setHours(23,59,59,999)).getTime();
+                                $.couponEndTime=useable[i].endTime;
+                                $.startIndex=useable[i].couponTitle.indexOf('频道：')+3;
+                                $.endIndex=useable[i].couponTitle.indexOf('元')+1;
 
-                                if(todayEndTime>couponEndTime){
-                                    console.log(`=================${useable[i].couponTitle}`);
+                                $.couponName=useable[i].couponTitle.substring($.startIndex,$.endIndex);
+
+
+                                console.log(`=================${useable[i].couponTitle}`);
+
+                                if($.couponEndTime<$.todayEndTime){
+                                    // console.log(`=================${useable[i].couponTitle}`);
+                                    // $.message += `【京东红包】${$.jdRed}(将过期${$.jdRedExpire.toFixed(2)})元 \n`;
+                                    $.message += `【极速优惠券】${$.couponName}(今日将过期) \n`;
+                                }
+                                else if($.couponEndTime<$.tomorrowEndTime){
+                                    $.message += `【极速优惠券】${$.couponName}(明日将过期) \n`;
                                 }
 
-
                             }
-
 
                         }
                     }

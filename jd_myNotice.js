@@ -1238,7 +1238,8 @@ function getCoupon() {
                         for (let i = 0; i < useable.length; i++) {
 
 
-                            if (useable[i].couponTitle.indexOf('9.9-') > -1||useable[i].couponTitle.indexOf('15-') > -1){
+                            if(useable[i].couponTitle.indexOf('极速版APP活动') > -1&&useable[i].couponTitle.indexOf('频道：') > -1){
+
                                 $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23,59,59,999)).getTime();
                                 $.tomorrowEndTime = new Date(new Date(new Date().getTime()+24*60*60*1000).setHours(23,59,59,999)).getTime();
                                 $.couponEndTime=useable[i].endTime;
