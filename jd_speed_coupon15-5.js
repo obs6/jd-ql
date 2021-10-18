@@ -67,7 +67,7 @@ if ($.isNode()) {
                     return;
 
                 }
-                else if(reslust.indexOf("已经参加过")>-1){
+                else if(reslust.indexOf("已经参加过")>-1||reslust.indexOf("领取成功")>-1){
                     break;
 
                 }
