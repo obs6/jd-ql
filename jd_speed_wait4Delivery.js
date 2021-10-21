@@ -104,7 +104,7 @@ function showMsg() {
         resolve()
     })
 }
-async function getOrderTrack(orderId){
+async function getOrderTrack(orderId,imgUrl){
     return new Promise(resolve => {
         let refer="https://wqs.jd.com/order/deal_wuliu.shtml?from=orderdetail&dealId="+orderId;
         optionsTrack = {
@@ -128,9 +128,10 @@ async function getOrderTrack(orderId){
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     if (safeGet(data)) {
+
                         if (data.indexOf("carriageId") >-1) {
                             data = $.toObj(data);
-
+                            console.log(`=====${JSON.stringify(data)}===`);
                             // console.log(`极速版签到查询奖品：异常:${data.carrier}\n`);
                             // console.log(`极速版签到查询奖品：异常:${data.carriageId}\n`);
 
@@ -138,10 +139,16 @@ async function getOrderTrack(orderId){
 
 
 
+
                             message += `订单号：${orderId}\n`+
+                                // `订单号：<img src="${imgUrl}"/>\n`+
+
+
                                 `商品名：${data.orderWareList[0].itemName}\n`+
                                 `物流消息：${data.carrier}==${data.carriageId}\n`+
+                                `时间：${data.dealLogList[data.dealLogList.length-1].createTime}\n`+
                                 `${data.dealLogList[data.dealLogList.length-1].wlStateDesc}\n`
+
                                 +"\n"+"\n"
 
                             // console.log("----"+message)
@@ -191,7 +198,7 @@ async function getOrderList() {
                         if (data.code === '0') {
                             if(data.orderList.length>0){
                                 for(let orderItem of data.orderList){
-                                    await getOrderTrack(orderItem.orderId);
+                                    await getOrderTrack(orderItem.orderId,orderItem.orderMsg.wareInfoList[0].imageurl);
 
 
                                 }
