@@ -1,9 +1,9 @@
 /*
 
 0 0 * 6 * jd_delCoupon.js
-
+21 0,22 * * * myNotice1.js, tag=测试, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 */
-const $ = new Env('删除优惠券');
+const $ = new Env('我的测试');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 const notify = $.isNode() ? require('./sendNotify') : '';
