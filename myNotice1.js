@@ -1,48 +1,36 @@
 /*
-京东极速版红包
-自动提现微信现金
-更新时间：2021-8-2
-活动时间：2021-4-6至2021-5-30
-活动地址：https://prodev.m.jd.com/jdlite/active/31U4T6S4PbcK83HyLPioeCWrD63j/index.html
-活动入口：京东极速版-领红包
-已支持IOS双京东账号,Node.js支持N个京东账号
-脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
-============Quantumultx===============
-[task_local]
-#京东极速版红包
-20 0,22 * * * jd_speed_redpocke.js, tag=京东极速版红包, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 
-================Loon==============
-[Script]
-cron "20 0,22 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包
+0 0 * 6 * jd_delCoupon.js
 
-===============Surge=================
-京东极速版红包 = type=cron,cronexp="20 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
-
-============小火箭=========
-京东极速版红包 = type=cron,script-path=jd_speed_redpocke.js, cronexpr="20 0,22 * * *", timeout=3600, enable=true
 */
-const $ = new Env('京东待收货');
-const notify = $.isNode() ? require('./sendNotify') : '';
+const $ = new Env('删除优惠券');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let cookiesArr = [], cookie = '', message='';
-let reslust = '';
-const JD_API_HOST = 'https://api.m.jd.com/client.action';
+const notify = $.isNode() ? require('./sendNotify') : '';
+
+//IOS等用户直接用NobyDa的jd cookie
+let cookiesArr = [], cookie = '',message='';
 if ($.isNode()) {
     Object.keys(jdCookieNode).forEach((item) => {
         cookiesArr.push(jdCookieNode[item])
     })
     if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {
     };
-    if (JSON.stringify(process.env).indexOf('GITHUB') > -1) process.exit(0);
 } else {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
+const jdNotify = $.getdata('jdUnsubscribeNotify');//是否关闭通知，false打开通知推送，true关闭通知推送
+let goodPageSize = $.getdata('jdUnsubscribePageSize') || 20;// 运行一次取消多少个已关注的商品。数字0表示不取关任何商品
+let shopPageSize = $.getdata('jdUnsubscribeShopPageSize') || 20;// 运行一次取消多少个已关注的店铺。数字0表示不取关任何店铺
+let stopGoods = $.getdata('jdUnsubscribeStopGoods') || '';//遇到此商品不再进行取关，此处内容需去商品详情页（自营处）长按拷贝商品信息
+let stopShop = $.getdata('jdUnsubscribeStopShop') || '';//遇到此店铺不再进行取关，此处内容请尽量从头开始输入店铺名称
+let delCount = 0;
+let hasKeyword = 0; // 包含关键词的券
+const JD_API_HOST = 'https://wq.jd.com/';
+
 !(async () => {
     if (!cookiesArr[0]) {
-        $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
-        return;
+        $.msg('【京东账号一】删除优惠券失败', '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
     }
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
@@ -51,260 +39,249 @@ if ($.isNode()) {
             $.index = i + 1;
             $.isLogin = true;
             $.nickName = '';
-            // message = '';
+            // $.message = '';
             await TotalBean();
             console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
             message+=`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`;
             if (!$.isLogin) {
                 $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
-
                 if ($.isNode()) {
                     await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
                 }
                 continue
             }
-            await jsRedPacket()
+            await getCoupon();
+            // if ($.isNode()) {
+            //     await notify.sendNotify($.name, message)
+            // }
 
-
-        }
-        if ($.isNode()) {
-            await notify.sendNotify($.name, message)
         }
     }
-})()
-    .catch((e) => {
-        $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
-    })
-    .finally(() => {
-        $.done();
-    })
+    await showMsg();
+    // if ($.isNode()) {
+    //     await notify.sendNotify($.name, $.message)
+    // }
+    // if ($.isNode()) {
+    //     await notify.sendNotify($.name, message)
+    // }
+})().catch((e) => {
+    $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
+}).finally(() => {
+    $.done();
+})
 
-async function jsRedPacket() {
-    try {
-        // await invite();
-        // const body = {
-        //     "newUiSwitch": "1",
-        //     "deis": "ey",
-        //     "pass": "",
-        //     "pagesize": "10",
-        //     "page": "1"
-        // };
-        await getOrderList()
-        await showMsg()
-
-    } catch (e) {
-        $.logErr(e)
-    }
-}
-
-function showMsg() {
+function delCoupon(couponId, couponTitle) {
     return new Promise(resolve => {
-        if (message) $.msg($.name, '', `京东账号${$.index}${$.nickName}\n${message}`);
-        resolve()
-    })
-}
-async function getOrderTrack(orderId){
-    return new Promise(resolve => {
-        let refer="https://wqs.jd.com/order/deal_wuliu.shtml?from=orderdetail&dealId="+orderId;
-         optionsTrack = {
-            url: "https://wq.jd.com/bases/wuliudetail/dealloglist?deal_id="+orderId,
-            headers: {
-                'Cookie': cookie,
-                "Accept": "*/*",
-                "Connection": "keep-alive",
-                "Referer":refer,
-                // "User-Agent": "jdltapp;iPhone;3.3.2;14.5.1network/wifi;hasUPPay/0;pushNoticeIsOpen/1;lang/zh_CN;model/iPhone13,2;addressid/137923973;hasOCPay/0;appBuild/1047;supportBestPay/0;pv/467.11;apprpd/MyJD_Main;",
-                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
-                "Accept-Language": "zh-Hans-CN;q=1, en-CN;q=0.9, zh-Hant-CN;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br"
-            }
-        }
-
-        $.get(optionsTrack, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (safeGet(data)) {
-                        if (data.indexOf("carriageId") >-1) {
-                        data = $.toObj(data);
-
-                            // console.log(`极速版签到查询奖品：异常:${data.carrier}\n`);
-                            // console.log(`极速版签到查询奖品：异常:${data.carriageId}\n`);
-
-
-
-
-
-                            message += `订单号：${orderId}\n`+
-                            `商品名：${data.orderWareList[0].itemName}\n`+
-                            `物流消息：${data.carrier}==${data.carriageId}\n`+
-                            `${data.dealLogList[data.dealLogList.length-1].wlStateDesc}\n`
-                            +"\n"+"\n"
-
-                            // console.log("----"+message)
-
-
-                        } else {
-                            console.log(`查询订单：异常:${orderId}\n`);
-                            console.log(`查询订单：异常:${JSON.stringify(data)}\n`);
-                        }
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-
-}
-async function getOrderList() {
-    return new Promise(resolve => {
-
         const options = {
-            url: `https://api.m.jd.com/client.action `,
-            body: `functionId=wait4Delivery&body={"newUiSwitch":"1","deis":"dy","dateTimeIndex":"","pass":"","pagesize":"10","page":"1"}&client=apple&clientVersion=10.1.2&openudid=f9438f3648dbbddf67a1d04253eb65250aa13aae&sign=976e85754a62c1d162525b7903ce1065&st=1634449352940&sv=102`,
+            url: `https://wq.jd.com/activeapi/deletecouponlistwithfinance?couponinfolist=${couponId}&_=${Date.now()}&sceneval=2&g_login_type=1&callback=jsonpCBKC&g_ty=ls`,
             headers: {
-                'Cookie': cookie,
-                "Host": "api.m.jd.com",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "*/*",
-                "Connection": "keep-alive",
-                "User-Agent": "jdltapp;iPhone;3.3.2;14.5.1network/wifi;hasUPPay/0;pushNoticeIsOpen/1;lang/zh_CN;model/iPhone13,2;addressid/137923973;hasOCPay/0;appBuild/1047;supportBestPay/0;pv/467.11;apprpd/MyJD_Main;",
-                "Accept-Language": "zh-Hans-CN;q=1, en-CN;q=0.9, zh-Hant-CN;q=0.8",
-                "Accept-Encoding": "gzip, deflate, br"
-            }
-        }
-
-        $.post(options, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    if (safeGet(data)) {
-                        data = $.toObj(data);
-                        if (data.code === '0') {
-                            if(data.orderList.length>0){
-                                for(let orderItem of data.orderList){
-                                    await getOrderTrack(orderItem.orderId);
-
-
-                                }
-
-                            }
-
-
-
-                        } else {
-                            console.log(`查询订单：异常:${JSON.stringify(data)}\n`);
-                        }
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-}
-
-function taskPostUrl(function_id, body) {
-    return {
-        url: `https://api.m.jd.com/`,
-        body: `appid=activities_platform&functionId=${function_id}&body=${escape(JSON.stringify(body))}&t=${+new Date()}`,
-        headers: {
-            'Cookie': cookie,
-            'Host': 'api.m.jd.com',
-            'Accept': '*/*',
-            'Connection': 'keep-alive',
-            // 'user-agent': $.isNode() ? (process.env.JS_USER_AGENT ? process.env.JS_USER_AGENT : (require('./JS_USER_AGENTS').USER_AGENT)) : ($.getdata('JSUA') ? $.getdata('JSUA') : "'jdltapp;iPad;3.1.0;14.4;network/wifi;Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-            'user-agent': "jdltapp;iPhone;3.3.2;14.3;b488010ad24c40885d846e66931abaf532ed26a5;network/4g;hasUPPay/0;pushNoticeIsOpen/0;lang/zh_CN;model/iPhone11,8;addressid/2005183373;hasOCPay/0;appBuild/1049;supportBestPay/0;pv/220.46;apprpd/;ref/JDLTSubMainPageViewController;psq/0;ads/;psn/b488010ad24c40885d846e66931abaf532ed26a5|520;jdv/0|iosapp|t_335139774|liteshare|CopyURL|1618673222002|1618673227;adk/;app_device/IOS;pap/JA2020_3112531|3.3.2|IOS 14.3;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1 ",
-            'Accept-Language': 'zh-Hans-CN;q=1,en-CN;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Content-Type': "application/x-www-form-urlencoded",
-            "referer": "https://an.jd.com/babelDiy/Zeus/q1eB6WUB8oC4eH1BsCLWvQakVsX/index.html"
-        }
-    }
-}
-
-
-function taskGetUrl(function_id, body) {
-    return {
-        url: `https://api.m.jd.com/?appid=activities_platform&functionId=${function_id}&body=${escape(JSON.stringify(body))}&t=${+new Date()}`,
-        headers: {
-            'Cookie': cookie,
-            'Host': 'api.m.jd.com',
-            'Accept': '*/*',
-            'Connection': 'keep-alive',
-            'user-agent': $.isNode() ? (process.env.JS_USER_AGENT ? process.env.JS_USER_AGENT : (require('./JS_USER_AGENTS').USER_AGENT)) : ($.getdata('JSUA') ? $.getdata('JSUA') : "'jdltapp;iPad;3.1.0;14.4;network/wifi;Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-            'Accept-Language': 'zh-Hans-CN;q=1,en-CN;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Content-Type': "application/x-www-form-urlencoded",
-            "referer": "https://an.jd.com/babelDiy/Zeus/q1eB6WUB8oC4eH1BsCLWvQakVsX/index.html"
-        }
-    }
-
-}
-
-
-function TotalBean() {
-    return new Promise(async resolve => {
-        const options = {
-            url: "https://me-api.jd.com/user_new/info/GetJDUserInfoUnion",
-            headers: {
-                Host: "me-api.jd.com",
-                Accept: "*/*",
-                Connection: "keep-alive",
-                Cookie: cookie,
+                'authority': 'wq.jd.com',
                 "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-                "Accept-Language": "zh-cn",
-                "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
-                "Accept-Encoding": "gzip, deflate, br"
+                'accept': '*/*',
+                'referer': 'https://wqs.jd.com/',
+                'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'cookie': cookie
             }
         }
         $.get(options, (err, resp, data) => {
             try {
-                if (err) {
-                    $.logErr(err)
-                } else {
-                    if (data) {
-                        data = JSON.parse(data);
-                        // console.log(data)
-                        if (data['retcode'] === "1001") {
-                            $.isLogin = false; //cookie过期
-                            return;
-                        }
-                        if (data['retcode'] === "0" && data.data && data.data.hasOwnProperty("userInfo")) {
-                            $.nickName = data.data.userInfo.baseInfo.nickname;
-                        }
-                    } else {
-                        console.log('京东服务器返回空数据');
-                    }
+                data = JSON.parse(data.match(new RegExp(/jsonpCBK.?\((.*);*/))[1]);
+                if (data.retcode === 0) {
+                    console.log(`删除优惠券---${couponTitle}----成功\n`);
+                    delCount++;
                 }
             } catch (e) {
-                $.logErr(e)
+                $.logErr(e, resp);
             } finally {
                 resolve();
             }
         })
     })
 }
-
-function safeGet(data) {
-    try {
-        if (typeof JSON.parse(data) == "object") {
-            return true;
+function getCoupon() {
+    return new Promise(resolve => {
+        let options = {
+            url: `https://wq.jd.com/activeapi/queryjdcouponlistwithfinance?state=1&wxadd=1&filterswitch=1&_=${Date.now()}&sceneval=2&g_login_type=1&callback=jsonpCBKB&g_ty=ls`,
+            headers: {
+                'authority': 'wq.jd.com',
+                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+                'accept': '*/*',
+                'referer': 'https://wqs.jd.com/',
+                'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'cookie': cookie
+            }
         }
-    } catch (e) {
-        console.log(e);
-        console.log(`京东服务器访问数据为空，请检查自身设备网络情况`);
-        return false;
-    }
+        $.get(options, async (err, resp, data) => {
+            try {
+                data = JSON.parse(data.match(new RegExp(/jsonpCBK.?\((.*);*/))[1]);
+                let couponTitle = ''
+                let couponId = ''
+                // 删除可使用且非超市、生鲜、京贴
+                let useable = data.coupon.useable
+                // console.log(`=================${JSON.stringify(data)}`);
+                for (let i = 0; i < useable.length; i++) {
+
+                    if(useable[i].couponStyle==7){
+                        message += `【白条券】===${useable[i].quota}-${useable[i].discount}() \n`;
+
+                        $.couponEndTime=getLocalTime(useable[i].endTime);
+                        $.platFormInfo=useable[i].platFormInfo;
+                        message += `过期时间: ${ $.couponEndTime}\n`;
+                        message += `${$.platFormInfo}\n`;
+
+
+
+
+                    }
+
+
+                }
+
+            } catch (e) {
+                $.logErr(e, resp);
+            } finally {
+                resolve();
+            }
+        })
+
+    })
+}
+// function getCoupon() {
+//     return new Promise(resolve => {
+//         let states = ['1', '6']
+//         for (let s = 0; s < states.length; s++) {
+//             let options = {
+//                 url: `https://wq.jd.com/activeapi/queryjdcouponlistwithfinance?state=${states[s]}&wxadd=1&filterswitch=1&_=${Date.now()}&sceneval=2&g_login_type=1&callback=jsonpCBKB&g_ty=ls`,
+//                 headers: {
+//                     'authority': 'wq.jd.com',
+//                     "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+//                     'accept': '*/*',
+//                     'referer': 'https://wqs.jd.com/',
+//                     'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+//                     'cookie': cookie
+//                 }
+//             }
+//             $.get(options, async (err, resp, data) => {
+//                 try {
+//                     data = JSON.parse(data.match(new RegExp(/jsonpCBK.?\((.*);*/))[1]);
+//                     let couponTitle = ''
+//                     let couponId = ''
+//                     if (states[s] === '6') {
+//                         // 删除已过期
+//                         let expire = data['coupon']['expired']
+//                         for (let i = 0; i < expire.length; i++) {
+//                             couponTitle = expire[i].couponTitle
+//                             couponId = escape(`${expire[i].couponid},1,0`);
+//                             await delCoupon(couponId, couponTitle)
+//                         }
+//                         // 删除已使用
+//                         let used = data['coupon']['used']
+//                         for (let i = 0; i < used.length; i++) {
+//                             couponTitle = used[i].couponTitle
+//                             couponId = escape(`${used[i].couponid},0,0`);
+//                             await delCoupon(couponId, couponTitle)
+//                         }
+//                     } else if (states[s] === '1') {
+//                         // 删除可使用且非超市、生鲜、京贴
+//                         // let useable = data.coupon.useable
+//                         // for (let i = 0; i < useable.length; i++) {
+//                         //     couponTitle = useable[i].limitStr
+//                         //     couponId = escape(`${useable[i].couponid},1,0`);
+//                         //     if (!isJDCoupon(couponTitle)) {
+//                         //         await delCoupon(couponId, couponTitle)
+//                         //     } else {
+//                         //         $.log(`跳过删除:${couponTitle}`)
+//                         //         hasKeyword++;
+//                         //     }
+//                         // }
+//                     }
+//                 } catch (e) {
+//                     $.logErr(e, resp);
+//                 } finally {
+//                     resolve();
+//                 }
+//             })
+//         }
+//     })
+// }
+
+function isJDCoupon(title) {
+    if (title.indexOf('京东') > -1)
+        return true
+    else if (title.indexOf('超市') > -1)
+        return true
+    else if (title.indexOf('京贴') > -1)
+        return true
+    else if (title.indexOf('全品类') > -1)
+        return true
+    else if (title.indexOf('话费') > -1)
+        return true
+    else if (title.indexOf('小鸽有礼') > -1)
+        return true
+    else if (title.indexOf('旗舰店') > -1)
+        return false
+    else if (title.indexOf('生鲜') > -1)
+        return true
+    else
+        return false
+}
+function showMsg() {
+    return new Promise(resolve => {
+        if (message) $.msg($.name, '', `京东账号${$.index}${$.nickName}\n${message}`);
+        resolve()
+    })
+}
+// function showMsg() {
+//     if (!jdNotify || jdNotify === 'false') {
+//         $.msg($.name, ``, `【京东账号${$.index}】${$.nickName}\n【已删除优惠券】${delCount}张\n【跳过含关键词】${hasKeyword}张`);
+//     } else {
+//         $.log(`\n【京东账号${$.index}】${$.nickName}\n【已删除优惠券】${delCount}张\n【跳过含关键词】${hasKeyword}张`);
+//     }
+// }
+
+function TotalBean() {
+    return new Promise(async resolve => {
+        const options = {
+            "url": `https://wq.jd.com/user/info/QueryJDUserInfo?sceneval=2`,
+            "headers": {
+                "Accept": "application/json,text/plain, */*",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": "zh-cn",
+                "Connection": "keep-alive",
+                "Cookie": cookie,
+                "Referer": "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
+                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
+            }
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    if (data) {
+                        data = JSON.parse(data);
+                        if (data['retcode'] === 13) {
+                            $.isLogin = false; //cookie过期
+                            return
+                        }
+                        if (data['retcode'] === 0) {
+                            $.nickName = (data['base'] && data['base'].nickname) || $.UserName;
+                        } else {
+                            $.nickName = $.UserName
+                        }
+                    } else {
+                        console.log(`京东服务器返回空数据`)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
 }
 
 function jsonParse(str) {
@@ -318,8 +295,9 @@ function jsonParse(str) {
         }
     }
 }
-
-// prettier-ignore
+function getLocalTime(nS) {
+    return new Date(parseInt(nS) ).toLocaleString().replace(/:\d{1,2}$/,' ');
+}
 function Env(t, e) {
     "undefined" != typeof process && JSON.stringify(process.env).indexOf("GITHUB") > -1 && process.exit(0);
 
@@ -607,12 +585,4 @@ function Env(t, e) {
             this.log("", `🔔${this.name}, 结束! 🕛 ${s} 秒`), this.log(), (this.isSurge() || this.isQuanX() || this.isLoon()) && $done(t)
         }
     }(t, e)
-}
-
-function randomString(e) {
-    e = e || 32;
-    let t = "abcdefghijklmnopqrstuvwxyz0123456789", a = t.length, n = "";
-    for (let i = 0; i < e; i++)
-        n += t.charAt(Math.floor(Math.random() * a));
-    return n
 }
