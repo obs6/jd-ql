@@ -970,7 +970,7 @@ function getCoupon() {
                         if ($.couponEndTime < $.todayEndTime) {
                             // console.log(`=================${useable[i].couponTitle}`);
                             // $.message += `【京东红包】${$.jdRed}(将过期${$.jdRedExpire.toFixed(2)})元 \n`;
-                            $.message += `【极速优惠券】${$.couponName}(今日将过期) \n`;
+                            $.message += `【极速优惠券】${$.couponName}(今日将过期🧧🧧🧧🧧) \n`;
                         } else if ($.couponEndTime < $.tomorrowEndTime) {
                             $.message += `【极速优惠券】${$.couponName}(明日将过期) \n`;
                         }
@@ -978,11 +978,24 @@ function getCoupon() {
                     }
                     //*****白条券
                     if (useable[i].couponStyle == 7) {
-                        $.couponEndTime = getLocalTime(useable[i].endTime);
-                        $.platFormInfo = useable[i].platFormInfo;
-                        $.message += `【白条券】=满${useable[i].quota}-${useable[i].discount} =====(${$.platFormInfo})\n`;
+                        $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23, 59, 59, 999)).getTime();
+                        $.couponEndTime = useable[i].endTime;
 
-                        $.message += `过期时间: ${$.couponEndTime}\n`;
+
+
+
+                        $.platFormInfo = useable[i].platFormInfo;
+
+                        $.message += `【白条券】=满${useable[i].quota}-${useable[i].discount} =====(${$.platFormInfo})\n`;
+                        if ($.couponEndTime < $.todayEndTime) {
+                            // console.log(`=================${useable[i].couponTitle}`);
+                            // $.message += `【京东红包】${$.jdRed}(将过期${$.jdRedExpire.toFixed(2)})元 \n`;
+                            $.message += `🧧🧧🧧🧧(今日将过期)===`;
+                        }
+                        $.message += `过期时间: ${getLocalTime($.couponEndTime)}\n`;
+                        $.message += `*********************************************\n`;
+
+
 
 
                     }
