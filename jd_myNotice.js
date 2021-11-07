@@ -1261,6 +1261,17 @@ function getCoupon() {
                                 }
 
                             }
+                            //*****白条券
+                            if(useable[i].couponStyle==7){
+                                $.couponEndTime=getLocalTime(useable[i].endTime);
+                                $.platFormInfo=useable[i].platFormInfo;
+                                message += `【白条券】=满${useable[i].quota}-${useable[i].discount} =====(${$.platFormInfo})\n`;
+
+                                message += `过期时间: ${ $.couponEndTime}\n`;
+
+
+                            }
+
 
                         }
 
