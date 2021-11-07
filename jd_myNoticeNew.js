@@ -211,6 +211,7 @@ async function bean() {
     }
     await queryexpirejingdou();//过期京豆
     await redPacket();//过期红包
+    await getJinTie();//过期红包
     await getCoupon();//过期红包
     // console.log(`昨日收入：${$.incomeBean}个京豆 🐶`);
     // console.log(`昨日支出：${$.expenseBean}个京豆 🐶`)
@@ -928,7 +929,78 @@ function ddFactoryTaskUrl(function_id, body = {}, function_id2) {
         timeout: 10000,
     }
 }
+function getJinTie() {
+    $.taskData = [];
+    const body = JSON.stringify({
+        channel: "sqcs",
+        "riskDeviceParam": JSON.stringify({
+            appId: "jdapp",
+            appType: "3",
+            clientVersion: "9.4.6",
+            deviceType: "iPhone11,8",
+            "eid": cookie,
+            "fp": "",
+            idfa: "",
+            imei: "",
+            ip: "",
+            macAddress: "",
+            networkType: "WIFI",
+            os: "iOS",
+            osVersion: "14.2",
+            token: "",
+            uuid: ""
+        })
+    })
+    const options = taskUrl('channelUserSubsidyInfo', body,'jrm');
+    return new Promise((resolve) => {
+        $.post(options, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    data = JSON.parse(data);
+                    if (data.resultCode === 0) {
+                        if (data.resultData.code === '000') {
+                            $.availableAmount = data.resultData.data.availableAmount;
+                            $.expiringcontext = data.resultData.data.expiringcontext;
 
+
+                            console.log(`总金贴：${$.availableAmount}\n`);
+                            $.message +=`【金贴】总金贴：${$.availableAmount}-----${$.expiringcontext}\n`;
+
+                        } else {
+                            console.log('获取金贴失败', data.resultData.msg)
+                        }
+                    } else {
+                        console.log('获取金贴失败', data.resultMsg)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp);
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+function taskUrl(function_id, body, type = 'mission') {
+    return {
+        url: `https://ms.jr.jd.com/gw/generic/${type}/h5/m/${function_id}?reqData=${encodeURIComponent(body)}`,
+        headers: {
+            'Accept' : `*/*`,
+            'Origin' : `https://u.jr.jd.com`,
+            'Accept-Encoding' : `gzip, deflate, br`,
+            'Cookie' : cookie,
+            'Content-Type' : `application/x-www-form-urlencoded;charset=UTF-8`,
+            'Host' : `ms.jr.jd.com`,
+            'Connection' : `keep-alive`,
+            "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+            'Referer' : `https://u.jr.jd.com/`,
+            'Accept-Language' : `zh-cn`
+        }
+    }
+}
 
 function getCoupon() {
     return new Promise(resolve => {
