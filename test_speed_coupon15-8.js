@@ -14,7 +14,7 @@
 
 ================Loon==============
 [Script]
-cron "0 7,10,15,18,21 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包15-5
+cron "0 8,10,12,14,16 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包9-5
 
 ===============Surge=================
 京东极速版红包 = type=cron,cronexp="20 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
@@ -43,8 +43,8 @@ if ($.isNode()) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
         return;
     }
-    await couponTurn("15-8");
-    await couponTurn("15-5");
+    await couponTurn("9-5");
+    await couponTurn("9-3");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
     //         cookie = cookiesArr[i];
@@ -150,18 +150,18 @@ function showMsg() {
 function getCoupon(type ) {
     return new Promise(resolve => {
         body="";
-        if(type==="15-5"){
+        if(type==="9-5"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=C0C36F773CF3DFCB52C7F04D94ECA04FC40C8C9C6ED46166A69A6EA99F8517F645C95346F3BC4F50A2DA691D5A889D2F_babel,roleId=E894A872878DA6047228B7126D705559_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56096731F76E470F9B06E5CFC233A1F52045_babel"
+                "args":"key=C7038C058D663615C3FB89D9D7241EFD0073842BA4F61B02362C15CEC3D8593C3621676C1A991F529DEAEFC2ECBC56D2_babel,roleId=0A0BB0F29F9A4608AD17D15DD5A2FD8C_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56091D7414FA95006A6D66481FBA3000D4AD_babel"
 
             };
-        }else if(type==="15-8"){
+        }else if(type==="9-3"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=C0C36F773CF3DFCB52C7F04D94ECA04FC40C8C9C6ED46166A69A6EA99F8517F645C95346F3BC4F50A2DA691D5A889D2F_babel,roleId=E894A872878DA6047228B7126D705559_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56096731F76E470F9B06E5CFC233A1F52045_babel"
+                "args":"key=F49BC0ADEB43EEEDA2D956FEBAB590546B63ED47E91B080CACB6026CF1A1D95C8CB438B45AA55746CE92DED1F6C5E427_babel,roleId=9AE9C4588991C3222B4CD30E88DC2D66_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB560974AA17FB819327F3DDFD0BB2E84EE1A1_babel"
 
             };
         }

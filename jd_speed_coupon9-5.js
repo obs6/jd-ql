@@ -14,7 +14,7 @@
 
 ================Loon==============
 [Script]
-cron "20 0,22 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包
+cron "0 8,10,12,14,16 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包9-5
 
 ===============Surge=================
 京东极速版红包 = type=cron,cronexp="20 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
@@ -43,39 +43,42 @@ if ($.isNode()) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
         return;
     }
-    for (let i = 0; i < cookiesArr.length; i++) {
-        if (cookiesArr[i]) {
-            cookie = cookiesArr[i];
-            $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-            $.index = i + 1;
-            $.isLogin = true;
-            $.nickName = '';
-            message = '';
-            await TotalBean();
-            console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
-            if (!$.isLogin) {
-                $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
-
-                if ($.isNode()) {
-                    await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
-                }
-                continue
-            }
-            for(let j = 0; j < 3; j++){
-                await jsRedPacket()
-                if(reslust.indexOf("抢完")>-1||reslust.indexOf("下一场")>-1){
-                    return;
-
-                }
-                else if(reslust.indexOf("已经参加过")>-1||reslust.indexOf("领取成功")>-1){
-                    break;
-
-                }
-
-            }
-
-        }
-    }
+    await couponTurn("9-5");
+    await couponTurn("9-3");
+    // for (let i = 0; i < cookiesArr.length; i++) {
+    //     if (cookiesArr[i]) {
+    //         cookie = cookiesArr[i];
+    //         $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+    //         $.index = i + 1;
+    //         $.isLogin = true;
+    //         $.nickName = '';
+    //         message = '';
+    //         await TotalBean();
+    //         console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+    //         if (!$.isLogin) {
+    //             $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+    //
+    //             if ($.isNode()) {
+    //                 await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+    //             }
+    //             continue
+    //         }
+    //         for(let j = 0; j < 3; j++){
+    //             await jsRedPacket("15-8")
+    //             if(reslust.indexOf("抢完")>-1||reslust.indexOf("下一场")>-1){
+    //                 break;
+    //
+    //             }
+    //             else if(reslust.indexOf("已经参加过")>-1||reslust.indexOf("领取成功")>-1){
+    //                 break;
+    //
+    //             }
+    //
+    //         }
+    //
+    //
+    //     }
+    // }
 })()
     .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -83,12 +86,53 @@ if ($.isNode()) {
     .finally(() => {
         $.done();
     })
+async function couponTurn(type) {
+    try {
+        // await invite();
+        for (let i = 0; i < cookiesArr.length; i++) {
+            if (cookiesArr[i]) {
+                cookie = cookiesArr[i];
+                $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+                $.index = i + 1;
+                $.isLogin = true;
+                $.nickName = '';
+                message = '';
+                await TotalBean();
+                console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+                if (!$.isLogin) {
+                    $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
 
-async function jsRedPacket() {
+                    if ($.isNode()) {
+                        await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+                    }
+                    continue
+                }
+                for(let j = 0; j < 3; j++){
+                    await jsRedPacket(type)
+                    if(reslust.indexOf("抢完")>-1||reslust.indexOf("下一场")>-1){
+                        return;
+
+                    }
+                    else if(reslust.indexOf("已经参加过")>-1||reslust.indexOf("领取成功")>-1){
+                        break;
+
+                    }
+
+                }
+
+
+            }
+        }
+
+    } catch (e) {
+        $.logErr(e)
+    }
+}
+async function jsRedPacket(type) {
     try {
         // await invite();
 
-        await getCoupon();
+        await getCoupon(type);
         await showMsg()
     } catch (e) {
         $.logErr(e)
@@ -103,15 +147,26 @@ function showMsg() {
 }
 
 
-function getCoupon( ) {
+function getCoupon(type ) {
     return new Promise(resolve => {
+        body="";
+        if(type==="9-5"){
+            body = {
+                "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
+                "scene":"1",
+                "args":"key=C7038C058D663615C3FB89D9D7241EFD0073842BA4F61B02362C15CEC3D8593C3621676C1A991F529DEAEFC2ECBC56D2_babel,roleId=0A0BB0F29F9A4608AD17D15DD5A2FD8C_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56091D7414FA95006A6D66481FBA3000D4AD_babel"
 
-        const body = {
-            "activityId":"vN4YuYXS1mPse7yeVPRq4TNvCMR",
-            "scene":"1",
-            "args":"key=7AE6994C328EB1C89CDB0221057BF411BD41956D70584237E1E4C232A0F444F7AB710999388695EC3FD474AA9F388E18_babel,roleId=FCF48ACDE201EF458A74ED8840CC1D01_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56096E128EEA6C65A59095B26F6CCE30580E_babel"
+            };
+        }else if(type==="9-3"){
+            body = {
+                "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
+                "scene":"1",
+                "args":"key=F49BC0ADEB43EEEDA2D956FEBAB590546B63ED47E91B080CACB6026CF1A1D95C8CB438B45AA55746CE92DED1F6C5E427_babel,roleId=9AE9C4588991C3222B4CD30E88DC2D66_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB560974AA17FB819327F3DDFD0BB2E84EE1A1_babel"
 
-        };
+            };
+        }
+
+
         const options = {
             url: `https://api.m.jd.com`,
             body: `functionId=lite_newBabelAwardCollection&body=${escape(JSON.stringify(body))}&_t=${+new Date()}&client=wh5`,
@@ -124,7 +179,7 @@ function getCoupon( ) {
                 "Connection": "keep-alive",
                 "User-Agent": "jdltapp;iPhone;3.3.2;14.5.1network/wifi;hasUPPay/0;pushNoticeIsOpen/1;lang/zh_CN;model/iPhone13,2;addressid/137923973;hasOCPay/0;appBuild/1047;supportBestPay/0;pv/467.11;apprpd/MyJD_Main;",
                 "Accept-Language": "zh-Hans-CN;q=1, en-CN;q=0.9, zh-Hant-CN;q=0.8",
-                'Referer': 'https://daily-redpacket.jd.com/?activityId=9WA12jYGulArzWS7vcrwhw',
+                'Referer': 'https://daily-redpacket.jd.com/?activityId=3H885vA4sQj6ctYzzPVix4iiYN2P',
                 "Accept-Encoding": "gzip, deflate, br"
             }
         }
