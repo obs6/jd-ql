@@ -96,6 +96,7 @@ if ($.isNode()) {
             message+=`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`;
 
             await do助力(inviteCode,invitor);
+            await $.wait(2 * 1000);
 
 
         }
