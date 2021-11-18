@@ -14,7 +14,7 @@
 
 ================Loon==============
 [Script]
-cron "22 7,9，10 * * *" script-path=jd_speed_redpocke.js,tag=我的京东极速版发财挖宝
+cron "22 7,9,10 * * *" script-path=jd_speed_redpocke.js,tag=我的京东极速版发财挖宝
 
 ===============Surge=================
 京东极速版红包 = type=cron,cronexp="23 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
