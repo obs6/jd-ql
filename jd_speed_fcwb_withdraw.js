@@ -92,6 +92,9 @@ if ($.isNode()) {
 var merge = {};
 async function jsRedPacket() {
     try {
+
+
+        await doExchange();
         await getRewordList();
         // await showMsg()
 
@@ -103,6 +106,32 @@ function showMsg() {
     return new Promise(resolve => {
         if (message) $.msg($.name, '', `京东账号${$.index}${$.nickName}\n${message}`);
         resolve()
+    })
+}
+function doExchange() {
+    return new Promise(resolve => {
+        const body ={"linkId":linkId发财挖宝,"round":2};
+        $.get(taskGetUrl("happyDigExchange",body), async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    if (safeGet(data)) {
+                        data = JSON.parse(data);
+                        if (data.code === 0) {
+                            console.log("放弃继续领取奖励====="+data.errMsg)
+                        } else {
+                            console.log(data.errMsg)
+                        }
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve(data);
+            }
+        })
     })
 }
 function getRewordList() {
