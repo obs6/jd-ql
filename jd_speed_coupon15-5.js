@@ -44,7 +44,7 @@ if ($.isNode()) {
         return;
     }
     // await couponTurn("15-8");
-    await couponTurn("15-5");
+    // await couponTurn("15-5");
     await couponTurn("25-8");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
