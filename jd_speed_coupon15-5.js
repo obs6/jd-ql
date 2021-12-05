@@ -44,7 +44,7 @@ if ($.isNode()) {
         return;
     }
     // await couponTurn("15-8");
-    // await couponTurn("15-5");
+    await couponTurn("15-5");
     await couponTurn("25-8");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
@@ -155,7 +155,7 @@ function getCoupon(type ) {
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=C0C36F773CF3DFCB52C7F04D94ECA04FC40C8C9C6ED46166A69A6EA99F8517F645C95346F3BC4F50A2DA691D5A889D2F_babel,roleId=E894A872878DA6047228B7126D705559_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56096731F76E470F9B06E5CFC233A1F52045_babel"
+                "args":"key=FDF7FA447E0C85BE16475D5AB7C03753A483085CE33EE8BD9CAA1C531332C968E951C9253FD1EED7C982415A80554532_babel,roleId=05AFB783B4F35E96FF2F37CF664DD0B8_babel,strengthenKey=CC4DCAF30C81F0457F9F18EE67B7CDA4CFB6EBEC69E065688357C95A0FDB0D15943033EB8EA959926434A4F4C53BC3FA_babel"
 
             };
         }else if(type==="25-8"){
