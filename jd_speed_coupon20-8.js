@@ -14,7 +14,7 @@
 
 ================Loon==============
 [Script]
-cron "0 9,11,16,18,20 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包9-5
+cron "0 7,10,15,18,21 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包20-8
 
 ===============Surge=================
 京东极速版红包 = type=cron,cronexp="20 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
@@ -22,7 +22,7 @@ cron "0 9,11,16,18,20 * * *" script-path=jd_speed_redpocke.js,tag=京东极速�
 ============小火箭=========
 京东极速版红包 = type=cron,script-path=jd_speed_redpocke.js, cronexpr="20 0,22 * * *", timeout=3600, enable=true
 */
-const $ = new Env('京东极速版优惠券9-5');
+const $ = new Env('京东极速版优惠券20-8');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -43,8 +43,9 @@ if ($.isNode()) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
         return;
     }
-    await couponTurn("9-5");
-    // await couponTurn("9-3");
+    // await couponTurn("15-8");
+    // await couponTurn("15-5");
+    await couponTurn("20-8");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
     //         cookie = cookiesArr[i];
@@ -150,18 +151,25 @@ function showMsg() {
 function getCoupon(type ) {
     return new Promise(resolve => {
         body="";
-        if(type==="9-5"){
+        if(type==="15-5"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=6EA0ABF695533CBE0805DEB0E78B386F90B8A1FE9ADEBF0A3652846A5940E044CA7679E80289E845DA1BB62128231084_bingo,roleId=DA504ABA8113DF83D464D4C71D8D5BC6_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E7873BC6F9DB31B455EA5A07460F4C52650_bingo"
+                "args":"key=896A5387D042F42E91BEBE4459FEFCEFB81FE810A5CC6A76050EA81AFCAE84C155E26729A24DEF54F79705D466BAB464_bingo,roleId=4A3788E74CC3C993D73CD90A692C334B_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E789BE74C1FBD4A14CBA52947F6F4EA90C5_bingo"
 
             };
-        }else if(type==="9-3"){
+        }else if(type==="20-8"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=F49BC0ADEB43EEEDA2D956FEBAB590546B63ED47E91B080CACB6026CF1A1D95C8CB438B45AA55746CE92DED1F6C5E427_babel,roleId=9AE9C4588991C3222B4CD30E88DC2D66_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB560974AA17FB819327F3DDFD0BB2E84EE1A1_babel"
+                "args":"key=2C19B0B6AA26F1D6AD10E0743AB9CF1199780825503B80B39EC6E17276A92C57E4E5729ED6AC733443034DD4BE04165E_bingo,roleId=C547A5D9939377E21446F2B016318096_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E789C12ED5737E255B8B559468B7F7880DD_bingo"
+
+            };
+        }else if(type==="15-8"){
+            body = {
+                "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
+                "scene":"1",
+                "args":"key=6A30D2E801AD95127A04340BDA075CB05BED1732984A803DF9E74662FEB71E38DBB6C8F9BB061FF58EA097625A7A1E13_babel,roleId=4509E62454EC10BDF6806F533D128E8B_babel,strengthenKey=F7C739F7C14E6891C88D53A56D8461947B92B4C8777674C1B3BC09C03BFB56093904D4703ECC8AB677715CF3232DF955_babel"
 
             };
         }

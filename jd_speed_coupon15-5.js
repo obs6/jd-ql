@@ -14,7 +14,7 @@
 
 ================Loon==============
 [Script]
-cron "0 7,10,15,18,21 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包15-5
+cron "0 8,10,12,14,16 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包15-5
 
 ===============Surge=================
 京东极速版红包 = type=cron,cronexp="20 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
@@ -45,7 +45,7 @@ if ($.isNode()) {
     }
     // await couponTurn("15-8");
     await couponTurn("15-5");
-    await couponTurn("25-8");
+    // await couponTurn("20-8");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
     //         cookie = cookiesArr[i];
@@ -155,14 +155,14 @@ function getCoupon(type ) {
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=FDF7FA447E0C85BE16475D5AB7C03753A483085CE33EE8BD9CAA1C531332C968E951C9253FD1EED7C982415A80554532_babel,roleId=05AFB783B4F35E96FF2F37CF664DD0B8_babel,strengthenKey=CC4DCAF30C81F0457F9F18EE67B7CDA4CFB6EBEC69E065688357C95A0FDB0D15943033EB8EA959926434A4F4C53BC3FA_babel"
+                "args":"key=896A5387D042F42E91BEBE4459FEFCEFB81FE810A5CC6A76050EA81AFCAE84C155E26729A24DEF54F79705D466BAB464_bingo,roleId=4A3788E74CC3C993D73CD90A692C334B_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E789BE74C1FBD4A14CBA52947F6F4EA90C5_bingo"
 
             };
-        }else if(type==="25-8"){
+        }else if(type==="20-8"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=DE5194A32B782D02574313A2C61567D1B4397C0E4F3F80D985F0FBE64F3408CAC89B757F8BFE84F96BC296F6C1DECAB2_babel,roleId=57929D344021B7CD0532EEFB52032F0D_babel,strengthenKey=CC4DCAF30C81F0457F9F18EE67B7CDA4CFB6EBEC69E065688357C95A0FDB0D15FD884D39D79A50AD34E05C4BF3DCAB13_babel"
+                "args":"key=2C19B0B6AA26F1D6AD10E0743AB9CF1199780825503B80B39EC6E17276A92C57E4E5729ED6AC733443034DD4BE04165E_bingo,roleId=C547A5D9939377E21446F2B016318096_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E789C12ED5737E255B8B559468B7F7880DD_bingo"
 
             };
         }else if(type==="15-8"){
