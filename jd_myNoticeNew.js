@@ -1048,25 +1048,32 @@ function getCoupon() {
                         }
 
                     }
-                    //*****白条券
-                    if (useable[i].couponStyle == 7) {
-                        $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23, 59, 59, 999)).getTime();
-                        $.couponEndTime = useable[i].endTime;
-
-
-
-
-                        $.platFormInfo = useable[i].platFormInfo;
-
-                        $.message += `【白条券】=满${useable[i].quota}-${useable[i].discount} =====(${$.platFormInfo})\n`;
-                        if ($.couponEndTime < $.todayEndTime) {
-                            // console.log(`=================${useable[i].couponTitle}`);
-                            // $.message += `【京东红包】${$.jdRed}(将过期${$.jdRedExpire.toFixed(2)})元 \n`;
-                            $.message += `🧧🧧🧧🧧(今日将过期)===`;
+                    //8是支付券， 7是白条券
+                    if(useable[i].couponStyle==7 || useable[i].couponStyle==8){
+                        $.beginTime=useable[i].beginTime;
+                        if($.beginTime>new Date().getTime()|| useable[i].quota >50 || useable[i].coupontype!=1){
+                            continue;
                         }
-                        $.message += `过期时间: ${getLocalTime($.couponEndTime)}\n`;
-                        $.message += `*********************************************\n`;
+                        $.couponType="白条券";
+                        if(useable[i].couponStyle==8){
+                            $.couponType="支付券";
+                        }
+                        $.message += `【${$.couponType}】===${useable[i].quota}-${useable[i].discount}() \n`;
+                        $.platFormInfo=useable[i].platFormInfo;
 
+                        $.message += `${$.platFormInfo}\n`;
+
+                        $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23, 59, 59, 999)).getTime();
+                        $.tomorrowEndTime = new Date(new Date(new Date().getTime() + 24 * 60 * 60 * 1000).setHours(23, 59, 59, 999)).getTime();
+                        $.couponEndTime=getLocalTime(useable[i].endTime);
+
+                        if (useable[i].endTime < $.todayEndTime) {
+                            $.message += `过期时间: ${ $.couponEndTime}(今日将过期🧧🧧🧧🧧) \n`;
+                        } else if (useable[i].endTime < $.tomorrowEndTime) {
+                            $.message += `过期时间: ${ $.couponEndTime}(明日日将过期🧧🧧🧧🧧) \n`;
+                        }else {
+                            $.message+= `过期时间: ${ $.couponEndTime}\n`;
+                        }
 
 
 
