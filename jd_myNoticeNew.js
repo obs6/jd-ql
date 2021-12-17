@@ -1025,7 +1025,30 @@ function getCoupon() {
                 // console.log(`=================${JSON.stringify(useable)}`);
                 for (let i = 0; i < useable.length; i++) {
 
+                    if (useable[i].limitStr.indexOf('全品类') > -1) {
+                        // console.log(`=================${useable[i].couponTitle}`);
+                        $.beginTime=useable[i].beginTime;
+                        if($.beginTime>new Date().getTime()|| useable[i].quota >20 || useable[i].coupontype!=1){
+                            continue;
+                        }
 
+                        $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23, 59, 59, 999)).getTime();
+                        $.tomorrowEndTime = new Date(new Date(new Date().getTime() + 24 * 60 * 60 * 1000).setHours(23, 59, 59, 999)).getTime();
+                        $.couponEndTime = useable[i].endTime;
+                        $.couponName=useable[i].limitStr;
+                        $.platFormInfo=useable[i].platFormInfo;
+                        $.value满=parseFloat(useable[i].quota);
+                        $.value减=parseFloat(useable[i].discount);
+                        if ($.couponEndTime < $.todayEndTime) {
+                            // $.message += `【京东红包】${$.jdRed}(将过期${$.jdRedExpire.toFixed(2)})元 \n`;
+                            $.message += `【东券-全品类】=满${$.value满}-${$.value减}元(今日将过期🧧🧧🧧🧧 )----${$.platFormInfo}\n`;
+                        } else {
+                            // console.log(`======22222========${useable[i].couponTitle}`);
+                            $.message += `【东券-全品类】=满${$.value满}-${$.value减}元----${$.platFormInfo}\n`;
+                        }
+
+
+                    }
                     if (useable[i].couponTitle.indexOf('极速版APP活动') > -1) {
 
                         $.todayEndTime = new Date(new Date(new Date().getTime()).setHours(23, 59, 59, 999)).getTime();
