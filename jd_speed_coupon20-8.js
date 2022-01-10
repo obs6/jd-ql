@@ -43,9 +43,10 @@ if ($.isNode()) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
         return;
     }
-    // await couponTurn("15-8");
-    // await couponTurn("15-5");
-    await couponTurn("20-8");
+    await couponTurn("15-5");
+    await couponTurn("5-2");
+
+    // await couponTurn("20-8");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
     //         cookie = cookiesArr[i];
@@ -155,14 +156,14 @@ function getCoupon(type ) {
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=896A5387D042F42E91BEBE4459FEFCEFB81FE810A5CC6A76050EA81AFCAE84C155E26729A24DEF54F79705D466BAB464_bingo,roleId=4A3788E74CC3C993D73CD90A692C334B_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E789BE74C1FBD4A14CBA52947F6F4EA90C5_bingo"
+                "args":"key=8C9530756467644A87C40DFAFFFC41C732AC04600F5EDD2124C791CCC30936092AF0DA561588ABE30B7326292DD2FD1C_bingo,roleId=B4D047F5AAEA72AFF78CE7F56323599F_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E788CC5DC76063D9942B19451458C72D42D_bingo"
 
             };
-        }else if(type==="20-8"){
+        }else if(type==="5-2"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=2C19B0B6AA26F1D6AD10E0743AB9CF1199780825503B80B39EC6E17276A92C57E4E5729ED6AC733443034DD4BE04165E_bingo,roleId=C547A5D9939377E21446F2B016318096_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E789C12ED5737E255B8B559468B7F7880DD_bingo"
+                "args":"key=5430F3FAC2C88054E3DBF4F8397F84D4640EE699CEB8027826F57C15E1099D241D7DBA5222CD67DED40BE302DCAC68FB_bingo,roleId=BD76F9321F7AE9FF3AE2EC0366317F9D_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E788B5A75402BA5A6D105BFB62967BE2CAE_bingo"
 
             };
         }else if(type==="15-8"){

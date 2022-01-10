@@ -14,7 +14,7 @@
 
 ================Loon==============
 [Script]
-cron "0 9,11,16,18,20 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包9-5
+cron "0 9,12,15,17,20 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包9-5
 
 ===============Surge=================
 京东极速版红包 = type=cron,cronexp="20 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
@@ -22,7 +22,7 @@ cron "0 9,11,16,18,20 * * *" script-path=jd_speed_redpocke.js,tag=京东极速�
 ============小火箭=========
 京东极速版红包 = type=cron,script-path=jd_speed_redpocke.js, cronexpr="20 0,22 * * *", timeout=3600, enable=true
 */
-const $ = new Env('京东极速版优惠券9-5');
+const $ = new Env('京东极速版优惠券25-8');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -43,7 +43,7 @@ if ($.isNode()) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
         return;
     }
-    await couponTurn("9-5");
+    await couponTurn("25-8");
     // await couponTurn("9-3");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
@@ -150,11 +150,11 @@ function showMsg() {
 function getCoupon(type ) {
     return new Promise(resolve => {
         body="";
-        if(type==="9-5"){
+        if(type==="25-8"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=6EA0ABF695533CBE0805DEB0E78B386F90B8A1FE9ADEBF0A3652846A5940E044CA7679E80289E845DA1BB62128231084_bingo,roleId=DA504ABA8113DF83D464D4C71D8D5BC6_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E7873BC6F9DB31B455EA5A07460F4C52650_bingo"
+                "args":"key=82D220E17FE679E7121909D498FF2EB5C2EC93F4E489A9A8F61A6FC0F8C4F1BD5F9134667F8D93E0236B505533F1DF6D_bingo,roleId=321D87167178BB04DBFB0FD3873ACDE4_bingo,strengthenKey=0D99BB8BE91CDC9905750DEB305FD666CCAFAB50802ADF2952A2DFC347A7FEE3F8F19EB603F403E63382056A72B8EF40_bingo"
 
             };
         }else if(type==="9-3"){

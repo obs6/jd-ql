@@ -14,7 +14,7 @@
 
 ================Loon==============
 [Script]
-cron "0 8,10,12,14,16 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包15-5
+cron "0 8,11,14,16,20 * * *" script-path=jd_speed_redpocke.js,tag=京东极速版红包15-5
 
 ===============Surge=================
 京东极速版红包 = type=cron,cronexp="20 0,22 * * *",wake-system=1,timeout=3600,script-path=jd_speed_redpocke.js
@@ -44,7 +44,7 @@ if ($.isNode()) {
         return;
     }
     // await couponTurn("15-8");
-    await couponTurn("15-5");
+    await couponTurn("10-4");
     // await couponTurn("20-8");
     // for (let i = 0; i < cookiesArr.length; i++) {
     //     if (cookiesArr[i]) {
@@ -151,11 +151,11 @@ function showMsg() {
 function getCoupon(type ) {
     return new Promise(resolve => {
         body="";
-        if(type==="15-5"){
+        if(type==="10-4"){
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=896A5387D042F42E91BEBE4459FEFCEFB81FE810A5CC6A76050EA81AFCAE84C155E26729A24DEF54F79705D466BAB464_bingo,roleId=4A3788E74CC3C993D73CD90A692C334B_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E789BE74C1FBD4A14CBA52947F6F4EA90C5_bingo"
+                "args":"key=487EC904C6B1645C58240E9132CF2C20D489FDA6705E38FD160577441AFCA97DD11A4962139818E0BE821B7F8086C282_bingo,roleId=914BA5C5D0E588C0F500E4858ACEF785_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E7880222F07D2589032FA880011D3DE8E12_bingo"
 
             };
         }else if(type==="20-8"){
