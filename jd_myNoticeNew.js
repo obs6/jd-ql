@@ -1060,14 +1060,15 @@ function getCoupon() {
                         $.couponName = useable[i].couponTitle.substring($.startIndex, $.endIndex);
 
 
-                        // console.log(`=================${useable[i].couponTitle}`);
-
                         if ($.couponEndTime < $.todayEndTime) {
                             // console.log(`=================${useable[i].couponTitle}`);
                             // $.message += `【京东红包】${$.jdRed}(将过期${$.jdRedExpire.toFixed(2)})元 \n`;
                             $.message += `【极速优惠券】${$.couponName}(今日将过期🧧🧧🧧🧧) \n`;
                         } else if ($.couponEndTime < $.tomorrowEndTime) {
                             $.message += `【极速优惠券】${$.couponName}(明日将过期) \n`;
+                        }else{
+                            $.couponEndTime=timeFormat(parseInt($.couponEndTime));
+                            $.message += `【极速优惠券】${$.couponName}(过期时间:${$.couponEndTime}) \n`;
                         }
 
                     }
