@@ -43,7 +43,7 @@ if ($.isNode()) {
         $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
         return;
     }
-    await couponTurn("15-5");
+    // await couponTurn("15-5");
     await couponTurn("5-2");
 
     // await couponTurn("20-8");
@@ -163,7 +163,7 @@ function getCoupon(type ) {
             body = {
                 "activityId":"3H885vA4sQj6ctYzzPVix4iiYN2P",
                 "scene":"1",
-                "args":"key=C1DEFD3C0396EDFC8215ACBF751C4620F0395465605CF9442326408CFB8A4F9825E83CD6C2B86F8929CB2F1095FB610F_bingo,roleId=23E2CB5340B5C6BEDF23627C434572F9_bingo,strengthenKey=188D4A0AF4408B93579AB0728411D6B5B69A623BFC6D7C8C4437BB41D2E97E785B29D5EBC5063BBD78DB73188C3B569A_bingo"
+                "args":"key=82955FF5B19B4873DD7044D75B44AD907C1A9FECE3BD974B2E35492750271EA91192D5362104AA91EDD08FFB7EFA944C_bingo,roleId=04BCD352B47E5A8B92C7D4ED398FBE33_bingo,strengthenKey=B95D6A81ACB1760E33CCD3461D64D27E5446F252C845E06C8CA0282A6B890B8633E6D3F3DA7B9E4184103EF5ECD45DDB_bingo"
 
             };
         }else if(type==="15-8"){
